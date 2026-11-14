@@ -21,10 +21,8 @@ window.CASSINO_CONFIG = {
   localPin: "0000",
 
   // Conta do crupier no Firebase. Com isso preenchido, o celular pede só o PIN.
-  // No console (Authentication → Users → Adicionar usuário), crie:
-  //   E-mail: crupier@cassino.festa
-  //   Senha:  cassino-0000      ← "cassino-" + o PIN
-  // Para trocar o PIN depois, mude a senha dessa conta para "cassino-" + novo PIN.
+  // A senha dessa conta no Firebase é "cassino-" seguido do PIN (o PIN não fica escrito aqui,
+  // porque este arquivo é público). Para trocar o PIN, mude a senha da conta no console.
   crupierEmail: "crupier@cassino.festa",
 
   // Tiers: do maior para o menor. "min" é a pontuação mínima para entrar no tier.
@@ -34,20 +32,13 @@ window.CASSINO_CONFIG = {
     { name: "Bronze", suit: "♣", red: false, min: 0,   metal: ["#ffcf9f", "#e9965a"] }
   ],
 
-  // ------------------------------------------------------------
-  // FIREBASE: troque o null abaixo pelo bloco firebaseConfig do console
-  // (Configurações do projeto → Seus apps → app web). Fica assim:
-  //
-  // firebase: {
-  //   apiKey: "AIza...",
-  //   authDomain: "seu-projeto.firebaseapp.com",
-  //   databaseURL: "https://seu-projeto-default-rtdb.firebaseio.com",
-  //   projectId: "seu-projeto",
-  //   appId: "1:123456:web:abcdef"
-  // }
-  //
-  // Enquanto estiver null, tudo roda em modo teste e a TV NÃO recebe
-  // o que é lançado no celular.
-  // ------------------------------------------------------------
-  firebase: null
+  // Firebase do projeto cassino-anna-gabi (a apiKey do Firebase é pública por natureza;
+  // quem protege o banco são as regras, que só deixam a conta do crupier gravar).
+  firebase: {
+    apiKey: "AIzaSyB8JJpqX-ecGIgtENvM34IDcVhgQmoBkyw",
+    authDomain: "cassino-anna-gabi.firebaseapp.com",
+    databaseURL: "https://cassino-anna-gabi-default-rtdb.firebaseio.com",
+    projectId: "cassino-anna-gabi",
+    appId: "1:253748701645:web:938cdd5bfd1991638fbc84"
+  }
 };
