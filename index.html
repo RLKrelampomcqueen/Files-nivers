@@ -564,7 +564,9 @@ window.CASSINO_CONFIG = {
   }
   /* Fotos: o placar procura foto-1.jpg, foto-2.jpg... na mesma pasta (para na primeira que faltar)
      e procura de novo a cada 3 minutos, então dá para subir fotos com o placar aberto. */
-  var photos = [], photoIdx = 0, FLIP_MS = 30000;
+  var FOTO_KEY = 'cassino_foto_idx';
+  var photos = [], photoIdx = 0, FLIP_MS = 5000;
+  try { photoIdx = Number(localStorage.getItem(FOTO_KEY)) || 0; } catch (e) {}
   function probe(url) {
     return fetch(url + '?v=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
       .then(function (r) { return r.ok; })
@@ -580,7 +582,9 @@ window.CASSINO_CONFIG = {
   function flipCard(card) {
     if (card.classList.contains('photo')) { card.classList.remove('photo'); return; }
     if (!photos.length) return;
-    var u = photos[photoIdx++ % photos.length];
+    var u = photos[photoIdx % photos.length];
+    photoIdx = (photoIdx + 1) % photos.length;
+    try { localStorage.setItem(FOTO_KEY, String(photoIdx)); } catch (e) {}
     var im = new Image();
     im.onload = function () { card.querySelector('.f-photo').style.backgroundImage = 'url("' + u + '")'; card.classList.add('photo'); };
     im.src = u;
@@ -603,7 +607,7 @@ window.CASSINO_CONFIG = {
   setTelao(/[?&]telao\b/.test(location.search));
   $('telaoBtn').addEventListener('click', function () { setTelao(!document.body.classList.contains('telao')); });
 
-  var latest = null, started = false, nextAt = 0, lastForce = 0;
+  var latest = null, started = false, nextAt = 0, lastForce = 0, dealtOnce = false;
 
   /* ?demo mostra jogadores de exemplo (sem gravar nada), útil para ver o visual. */
   var DEMO = /[?&]demo\b/.test(location.search);
@@ -690,7 +694,9 @@ window.CASSINO_CONFIG = {
     saveCurrent(pmap, map);
 
     var timer = $('timer'); timer.classList.remove('pulse'); void timer.offsetWidth; timer.classList.add('pulse');
-    dealDuo();
+    /* As cartas só são "dadas" na primeira vez; depois o timer atualiza apenas o ranking,
+       e as fotos seguem rodando na ordem, sem reiniciar. */
+    if (!dealtOnce) { dealtOnce = true; dealDuo(); }
   }
 
   function frame() {
