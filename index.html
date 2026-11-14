@@ -564,7 +564,7 @@ window.CASSINO_CONFIG = {
   }
   /* Fotos: o placar procura foto-1.jpg, foto-2.jpg... na mesma pasta (para na primeira que faltar)
      e procura de novo a cada 3 minutos, então dá para subir fotos com o placar aberto. */
-  var photos = [], photoIdx = 0, FLIP_MS = 8000;
+  var photos = [], photoIdx = 0, FLIP_MS = 30000;
   function probe(url) {
     return fetch(url + '?v=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
       .then(function (r) { return r.ok; })
