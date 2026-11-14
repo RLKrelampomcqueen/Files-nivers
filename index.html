@@ -211,6 +211,9 @@ input::placeholder{color:rgba(43,21,18,.62)}
   body.telao .duo{--cw:min(12.5vw,24svh);margin:calc(var(--cw)*.12) calc(var(--cw)*.1) calc(var(--cw)*.06)}
   body.telao .hero-copy{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 32px}
   body.telao h1.neon{font-size:clamp(2.4rem,4.8vw,5rem);transform:none;padding-block:.05em}
+  /* Folga entre o título e o card do líder (o neon e as letras em script passam da caixa do texto). */
+  body.telao .hero-copy{row-gap:clamp(16px,3vh,32px)}
+  body.telao h1.neon{padding-bottom:.16em}
   body.telao .meta{margin-top:0}
   body.telao .timer{width:clamp(70px,6vw,100px)}
   body.telao .timer .t strong{font-size:clamp(.9rem,1.25vw,1.4rem);font-size:26cqi}
