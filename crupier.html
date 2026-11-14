@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Mesa do crupier</title>
+<meta name="theme-color" content="#281110">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎰%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700&family=Mr+Dafoe&family=Poppins:wght@300;400;500;600&family=Yellowtail&display=swap" rel="stylesheet">
+<style>
+/* Tema "Jogo do Bicho & Cassino": identidade do convite da Anna e da Gabi.
+   Vinho escuro com versos de cartas, papel branco com tinta vermelha e título em script neon. */
+:root{
+  --wine:#281110; --wine-deep:#150707;
+  /* Escada de vermelhos (mesmo matiz, ~358°): tinta do convite e variações dela */
+  --red-900:#55090c; --red-deep:#7c0f13; --red:#b41417; --red-bright:#c91c21; --red-hi:#d26364;
+  --glow:201,28,33; --blush:#f7e6e3;
+  --paper:#f6f4f1; --ink:#2b1512;
+  --silver:#b9aaa4; --silver-2:#e3d7d1;
+  --text:#f4eae4; --text-2:rgba(244,234,228,.8);
+  --ok:#14683a; --bad:#7c0f13; --muted:#6e5f5a;
+  --on:#6fbf8a; --warn:#d9a24f;
+  --script:'Mr Dafoe','Yellowtail',cursive;
+  --script-2:'Yellowtail','Mr Dafoe',cursive;
+  --serif:'Bodoni Moda','Didot',Georgia,serif;
+  --body:'Poppins','Segoe UI',system-ui,sans-serif;
+  --cards:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1800 1200'%3E%3Cdefs%3E%3Cpattern id='h' width='7' height='7' patternUnits='userSpaceOnUse' patternTransform='rotate(45)'%3E%3Crect width='7' height='7' fill='%232d1614'/%3E%3Crect width='2' height='7' fill='%233b1e1b'/%3E%3C/pattern%3E%3Cg id='c'%3E%3Crect x='-150' y='-215' width='300' height='430' rx='22' fill='%23a8a39e'/%3E%3Crect x='-141' y='-206' width='282' height='412' rx='16' fill='%231d0d0c'/%3E%3Crect x='-129' y='-194' width='258' height='388' rx='10' fill='url(%23h)'/%3E%3Crect x='-116' y='-181' width='232' height='362' rx='6' fill='none' stroke='%236e4b47' stroke-width='1.5'/%3E%3C/g%3E%3C/defs%3E%3Crect width='1800' height='1200' fill='%23251110'/%3E%3Cuse href='%23c' transform='translate(200 160) rotate(-16)'/%3E%3Cuse href='%23c' transform='translate(640 90) rotate(9)'/%3E%3Cuse href='%23c' transform='translate(1060 210) rotate(-8)'/%3E%3Cuse href='%23c' transform='translate(1500 110) rotate(14)'/%3E%3Cuse href='%23c' transform='translate(1720 540) rotate(-12)'/%3E%3Cuse href='%23c' transform='translate(110 650) rotate(12)'/%3E%3Cuse href='%23c' transform='translate(560 570) rotate(-6)'/%3E%3Cuse href='%23c' transform='translate(990 650) rotate(15)'/%3E%3Cuse href='%23c' transform='translate(1400 880) rotate(-10)'/%3E%3Cuse href='%23c' transform='translate(300 1090) rotate(8)'/%3E%3Cuse href='%23c' transform='translate(820 1060) rotate(-14)'/%3E%3Cuse href='%23c' transform='translate(1660 1120) rotate(6)'/%3E%3C/svg%3E");
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+html{min-height:100%}
+body{
+  min-height:100vh;font-family:var(--body);font-size:17px;line-height:1.4;color:var(--text);
+  background:
+    radial-gradient(120% 90% at 50% 40%,rgba(21,7,7,.15),rgba(21,7,7,.82) 100%),
+    linear-gradient(rgba(21,7,7,.45),rgba(21,7,7,.7)),
+    var(--cards) center top/cover no-repeat fixed,
+    var(--wine);
+}
+body > *{position:relative;z-index:1}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red-hi);outline-offset:2px}
+
+/* Título e rótulos em script, como no convite */
+.neon{
+  font-family:var(--script);font-weight:400;color:var(--red-bright);
+  -webkit-text-stroke:1.5px var(--red-hi);paint-order:stroke fill;
+  text-shadow:0 0 .1em rgba(var(--glow),.8),0 0 .42em rgba(var(--glow),.5),0 0 1em rgba(var(--glow),.28);
+}
+.script{font-family:var(--script-2);font-weight:400}
+
+/* Avatar do jogador: emoji em tons de cinza sobre uma fichinha vermelha com anel de papel */
+.card .emoji,.pl .e,.who .e{
+  display:grid;place-items:center;border-radius:50%;background:var(--red);isolation:isolate;line-height:1;
+  width:2.1em;height:2.1em;box-shadow:inset 0 0 0 .09em var(--paper),0 0 0 1px var(--red);
+}
+.card .emoji > span,.pl .e > span,.who .e > span{filter:grayscale(1) contrast(1.2);mix-blend-mode:luminosity}
+
+/* Botões */
+.btn{
+  cursor:pointer;border:0;border-radius:999px;padding:.6em 1.3em;min-height:44px;font-weight:600;letter-spacing:.01em;
+  background:var(--red);color:#fff;transition:background .15s,transform .08s;
+}
+a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn:hover{background:var(--red-bright)}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn:disabled{opacity:.4;cursor:not-allowed;background:var(--red)}
+.btn.ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1.5px var(--silver)}
+.btn.ghost:hover{background:rgba(255,255,255,.1)}
+.panel .btn.ghost{color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red)}
+.panel .btn.ghost:hover{background:var(--red);color:#fff}
+.btn.danger{background:var(--red-deep);color:#fff}
+.btn.danger:hover{background:var(--red-900)}
+.btn.small{min-height:34px;font-size:.88em;padding:.3em .95em}
+
+input[type=text],input[type=password],input[type=email],input[type=number],input[type=search]{
+  width:100%;background:#fff;border:1.5px solid var(--red);border-radius:12px;padding:.65em .85em;color:var(--ink);
+}
+input::placeholder{color:rgba(43,21,18,.62)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+</style>
+<style>
+  header.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;padding:clamp(16px,2.4vw,32px) clamp(14px,3vw,40px) 12px}
+  header.top h1{font-size:clamp(3rem,6.4vw,5.6rem);line-height:.95;padding:.06em .15em .1em 0;transform:rotate(-3deg);transform-origin:left center}
+  header.top p{font-family:var(--script-2);font-size:clamp(1.3rem,2.2vw,2.2rem);line-height:1.1;color:var(--silver-2);margin-top:2px}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chip{display:inline-flex;align-items:center;font-size:.92em;color:var(--text-2);margin-right:6px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:#888}
+  .dot.online{background:var(--on)}.dot.local{background:var(--warn)}.dot.offline,.dot.error{background:var(--red-hi)}
+
+  main{padding:8px clamp(14px,3vw,40px) 48px}
+  .panel{position:relative;background:var(--paper);color:var(--ink);border-radius:20px;padding:clamp(18px,2vw,30px);box-shadow:0 26px 50px -22px rgba(0,0,0,.85)}
+  .panel::before{content:"";position:absolute;inset:6px;border:1.2px solid var(--red);border-radius:15px;pointer-events:none}
+  .panel h2{font-family:var(--serif);font-weight:700;font-size:1.7rem;line-height:1.1;color:var(--red);margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr);gap:20px;align-items:start}
+  .col{display:grid;gap:20px}
+  .sticky{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+
+  .login{max-width:440px;margin:6vh auto 0}
+  .login form{display:grid;gap:14px}
+  .login label{display:grid;gap:5px;font-weight:600}
+  .mode-note{margin:0 0 14px;padding:10px 12px;border:1px solid var(--red);background:var(--blush);color:var(--ink);font-size:.92rem;line-height:1.45}
+  .msg{min-height:1.3em;color:var(--bad);font-weight:600}
+
+  .tools{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
+  .addrow{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:14px}
+  .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:10px}
+  .pl{
+    cursor:pointer;text-align:left;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;min-height:56px;
+    background:#fff;border:1.5px solid rgba(180,20,23,.22);border-radius:12px;padding:10px 12px;color:var(--ink);
+  }
+  .pl:hover{border-color:var(--red)}
+  .pl.sel{border-color:var(--red);background:var(--blush);box-shadow:inset 0 0 0 1px var(--red)}
+  .pl .e{grid-row:span 2;font-size:1.05rem}
+  .pl .n{font-weight:600;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pl b{font-family:var(--serif);font-size:1rem;color:var(--red);font-variant-numeric:tabular-nums}
+  .none{color:rgba(43,21,18,.72);padding:8px 2px}
+
+  .who{display:flex;align-items:center;gap:12px;margin-bottom:14px;min-height:56px}
+  .who .e{font-size:1.35rem}
+  .who strong{display:block;font-family:var(--serif);font-weight:700;font-size:1.6rem;line-height:1.05;color:var(--ink)}
+  .who span{color:var(--red);font-weight:600}
+  .launch form{display:grid;gap:14px}
+  .launch label{display:grid;gap:5px;font-weight:600}
+  .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .quick button{
+    cursor:pointer;border-radius:12px;padding:.55em 0;min-height:44px;font-weight:600;font-size:1.05rem;
+    background:#fff;border:1.5px solid var(--red);color:var(--red);transition:background .12s,color .12s;
+  }
+  .quick button:hover{background:var(--red);color:#fff}
+  .quick .neg{border-color:var(--ink);color:var(--ink)}
+  .quick .neg:hover{background:var(--ink);color:#fff}
+  .amount{font-family:var(--serif);font-size:2rem!important;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+  .next{font-size:.92rem;color:rgba(43,21,18,.78)}
+  .next b{color:var(--red)}
+  .field{display:grid;gap:5px}
+  .field>label{font-weight:600}
+  .amountrow{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:stretch}
+  .amountrow .btn{font-size:1.4rem;padding:0 .9em}
+  .hint{min-height:1.3em;color:var(--bad);font-weight:600;font-size:.92rem}
+
+  .log{display:grid;gap:6px;max-height:340px;overflow:auto}
+  .log .row{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 12px;border-radius:12px;background:#fff;border:1px solid rgba(180,20,23,.18)}
+  .log time{color:rgba(43,21,18,.72);font-size:.88rem;font-variant-numeric:tabular-nums}
+  .log .who2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .log .who2 small{color:rgba(43,21,18,.72);margin-left:6px;font-weight:400}
+  .pos{color:var(--ok);font-weight:700}.neg{color:var(--bad);font-weight:700}
+
+  #toast{
+    position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);opacity:0;pointer-events:none;
+    background:var(--paper);color:var(--ink);padding:.75em 1.3em;border-radius:999px;font-weight:600;border:2px solid var(--red);
+    box-shadow:0 12px 28px rgba(0,0,0,.6);transition:opacity .2s,transform .2s;z-index:10;max-width:92vw;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%)}
+  #toast.err{background:var(--red);color:#fff;border-color:var(--red-hi)}
+
+  @media (max-width:900px){.grid{grid-template-columns:1fr}.sticky{position:static;max-height:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1 class="neon" id="title">Mesa do crupier</h1>
+    <p id="sub"></p>
+  </div>
+  <div class="actions" id="topActions" hidden>
+    <span class="chip"><span class="dot" id="dot"></span><span id="status">Conectando…</span></span>
+    <a class="btn ghost small" href="index.html" target="_blank" rel="noopener">Abrir dashboard</a>
+    <button class="btn small" id="forceBtn" type="button">Atualizar tierlist agora</button>
+    <button class="btn ghost small" id="csvBtn" type="button">Exportar CSV</button>
+    <button class="btn ghost small" id="resetBtn" type="button">Zerar pontos</button>
+    <button class="btn ghost small" id="logoutBtn" type="button">Sair</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel login" id="login">
+    <h2>Entrar na mesa</h2>
+    <p class="mode-note" id="modeNote" hidden>Modo teste: os lançamentos ficam só neste aparelho e não aparecem na TV. Para sincronizar, cole a configuração do Firebase no config.js.</p>
+    <form id="loginForm" autocomplete="off">
+      <label id="emailWrap" hidden>E-mail do crupier<input type="email" id="email" autocomplete="username"></label>
+      <label><span id="passLabel">Senha</span><input type="password" id="pass" autocomplete="current-password"></label>
+      <div class="msg" id="loginMsg" role="alert"></div>
+      <button class="btn" type="submit">Entrar</button>
+    </form>
+  </section>
+
+  <div class="grid" id="app" hidden>
+    <section class="panel">
+      <h2>Jogadores</h2>
+      <form class="addrow" id="addForm" autocomplete="off">
+        <input type="text" id="newName" maxlength="28" placeholder="Nome do novo jogador" aria-label="Nome do novo jogador">
+        <button class="btn" type="submit">Adicionar jogador</button>
+      </form>
+      <div class="tools"><input type="search" id="search" placeholder="Buscar jogador" aria-label="Buscar jogador"></div>
+      <div class="plist" id="plist"></div>
+    </section>
+
+    <div class="col">
+      <section class="panel launch sticky">
+        <h2>Lançar pontos</h2>
+        <div class="who" id="who"></div>
+        <form id="launchForm" autocomplete="off">
+          <div class="quick" id="quick"></div>
+          <div class="field">
+            <label for="amount">Pontos (use ± para descontar)</label>
+            <div class="amountrow">
+              <button type="button" class="btn ghost" id="signBtn" aria-label="Trocar entre ganhar e descontar pontos">±</button>
+              <input class="amount" type="number" id="amount" step="1" inputmode="numeric" placeholder="0" aria-describedby="amountHint">
+            </div>
+            <div class="hint" id="amountHint" role="alert"></div>
+          </div>
+          <label>Motivo (opcional)
+            <input type="text" id="note" maxlength="40" placeholder="Ex.: Roleta, blackjack, desafio">
+          </label>
+          <button class="btn" type="submit" id="launchBtn" disabled>Lançar pontos</button>
+          <div class="next" id="next"></div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Últimos lançamentos</h2>
+        <div class="log" id="log"></div>
+      </section>
+    </div>
+  </div>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO DO CASSINO DE PONTOS
+   Edite só este arquivo para personalizar tudo.
+   ============================================================ */
+window.CASSINO_CONFIG = {
+  eventName: "Jogo do Bicho & Cassino",
+  subtitle: "Anna e Gabi",
+
+  // Texto da carta de convite que aparece na abertura do placar.
+  eventDate: "Sábado, 14 de novembro, 20h",
+  dressCode: "Jogo do Bicho",
+
+  // De quantos em quantos minutos o tierlist do dashboard é atualizado.
+  // As atualizações seguem o relógio (:00, :03, :06...), então várias telas ficam sincronizadas.
+  refreshMinutes: 3,
+
+  // Limite de pontos por lançamento (evita erro de digitação, ex.: 5000 em vez de 50).
+  maxLaunch: 100000,
+
+  // Modo teste (sem Firebase): PIN do crupier.
+  // Com Firebase configurado, o crupier entra com e-mail e senha.
+  localPin: "0000",
+
+  // Tiers: do maior para o menor. "min" é a pontuação mínima para entrar no tier.
+  tiers: [
+    { name: "Ouro",     suit: "♥", red: true,  min: 500,  metal: ["#ffe39a", "#ffb86b"] },
+    { name: "Prata",    suit: "♠", red: false, min: 250,  metal: ["#f4f1ea", "#cfc9bd"] },
+    { name: "Bronze",   suit: "♣", red: false, min: 0,    metal: ["#ffcf9f", "#e9965a"] }
+  ],
+
+  // Cole aqui a configuração do Firebase (veja o LEIAME.md, passo 1).
+  // Enquanto estiver null, o sistema roda em modo teste: dados só no mesmo navegador.
+  firebase: null
+  /* Exemplo:
+  firebase: {
+    apiKey: "AIza...",
+    authDomain: "meu-projeto.firebaseapp.com",
+    databaseURL: "https://meu-projeto-default-rtdb.firebaseio.com",
+    projectId: "meu-projeto",
+    appId: "1:123456:web:abcdef"
+  }
+  */
+};
+
+</script>
+<script src="config.js"></script>
+<script>
+/* Camada de dados compartilhada entre dashboard e crupier.
+   - Com Firebase configurado: tempo real entre dispositivos.
+   - Sem Firebase: modo teste via localStorage (mesmo navegador). */
+(function () {
+  'use strict';
+  var CFG = window.CASSINO_CONFIG || {};
+  var fb = CFG.firebase;
+  var hasFirebase = !!(fb && fb.apiKey && fb.databaseURL);
+  var EMOJIS = ['🎲', '🃏', '🎰', '🍒', '👑', '💎', '🍀', '🎩', '🥂', '🔥', '⭐', '🦁'];
+  var randEmoji = function () { return EMOJIS[Math.floor(Math.random() * EMOJIS.length)]; };
+  var uid = function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); };
+  var cleanName = function (n) { return String(n || '').trim().replace(/\s+/g, ' ').slice(0, 28); };
+
+  /* Armazenamento seguro: em pré-visualizações e iframes o navegador pode bloquear
+     localStorage/sessionStorage. Nesse caso usa a memória da página, sem travar. */
+  var mem = { local: {}, session: {} };
+  function pick(kind) {
+    try { var s = window[kind + 'Storage']; s.setItem('__t', '1'); s.removeItem('__t'); return s; } catch (e) { return null; }
+  }
+  var LS = pick('local'), SS = pick('session');
+  function sget(area, k) { var s = area === 'local' ? LS : SS; if (s) return s.getItem(k); return mem[area][k] === undefined ? null : mem[area][k]; }
+  function sset(area, k, v) { var s = area === 'local' ? LS : SS; if (s) s.setItem(k, v); else mem[area][k] = String(v); }
+  function sdel(area, k) { var s = area === 'local' ? LS : SS; if (s) s.removeItem(k); else delete mem[area][k]; }
+
+  function emitter() {
+    var subs = new Set();
+    return {
+      on: function (cb) { subs.add(cb); return function () { subs.delete(cb); }; },
+      emit: function (v) { subs.forEach(function (cb) { try { cb(v); } catch (e) { console.error(e); } }); }
+    };
+  }
+
+  function checkDelta(d) {
+    if (!Number.isInteger(d) || d === 0) throw new Error('Informe um número inteiro diferente de zero.');
+    var max = Number(CFG.maxLaunch) || 100000;
+    if (Math.abs(d) > max) throw new Error('Máximo de ' + max.toLocaleString('pt-BR') + ' pontos por lançamento.');
+    return d;
+  }
+
+  function checkName(name, players) {
+    name = cleanName(name);
+    if (!name) throw new Error('Informe o nome do jogador.');
+    var dup = players.some(function (p) { return String(p.name).toLowerCase() === name.toLowerCase(); });
+    if (dup) throw new Error('Já existe um jogador com esse nome.');
+    return name;
+  }
+
+  /* ---------------- MODO TESTE (localStorage) ---------------- */
+  function createLocalStore() {
+    var KEY = 'cassino_state_v1', PIN_KEY = 'cassino_pin_ok';
+    var data = emitter(), status = emitter(), authE = emitter();
+    var bc = null; try { bc = ('BroadcastChannel' in window) ? new BroadcastChannel('cassino_v1') : null; } catch (e) { bc = null; }
+
+    function read() {
+      try { var s = JSON.parse(sget('local', KEY)); if (s && s.players) return s; } catch (e) {}
+      return { players: {}, log: {}, forceRefresh: 0 };
+    }
+    function view() {
+      var s = read();
+      return {
+        ready: true,
+        forceRefresh: s.forceRefresh || 0,
+        players: Object.keys(s.players).map(function (id) { return Object.assign({ id: id }, s.players[id]); }),
+        log: Object.keys(s.log || {}).map(function (id) { return Object.assign({ id: id }, s.log[id]); })
+          .sort(function (a, b) { return b.ts - a.ts; }).slice(0, 200)
+      };
+    }
+    function notify() { data.emit(view()); }
+    function commit(s) {
+      try { sset('local', KEY, JSON.stringify(s)); } catch (e) { console.error(e); }
+      if (bc) bc.postMessage(1);
+      notify();
+    }
+    if (bc) bc.onmessage = notify;
+    window.addEventListener('storage', function (e) { if (e.key === KEY) notify(); });
+    var authed = function () { try { return sget('session', PIN_KEY) === '1'; } catch (e) { return false; } };
+
+    return {
+      mode: 'local',
+      subscribe: function (cb) { var off = data.on(cb); cb(view()); return off; },
+      onStatus: function (cb) { var off = status.on(cb); cb('local'); return off; },
+      addPlayer: async function (name) {
+        name = checkName(name, view().players);
+        var s = read(), id = uid();
+        s.players[id] = { name: name, points: 0, emoji: randEmoji() };
+        commit(s); return id;
+      },
+      removePlayer: async function (id) { var s = read(); delete s.players[id]; commit(s); },
+      launch: async function (id, delta, note) {
+        checkDelta(delta);
+        var s = read(); var p = s.players[id];
+        if (!p) throw new Error('Jogador não encontrado.');
+        p.points = (Number(p.points) || 0) + delta;
+        s.log = s.log || {};
+        s.log[uid()] = { playerId: id, name: p.name, delta: delta, note: note || '', ts: Date.now() };
+        commit(s);
+      },
+      undo: async function (logId) {
+        var s = read(); var l = (s.log || {})[logId]; if (!l) return;
+        if (s.players[l.playerId]) s.players[l.playerId].points = (Number(s.players[l.playerId].points) || 0) - l.delta;
+        delete s.log[logId]; commit(s);
+      },
+      forceRefresh: async function () { var s = read(); s.forceRefresh = Date.now(); commit(s); },
+      resetPoints: async function () {
+        var s = read();
+        Object.keys(s.players).forEach(function (id) { s.players[id].points = 0; });
+        s.log = {}; commit(s);
+      },
+      auth: {
+        kind: 'pin',
+        login: async function (pin) {
+          if (String(pin) !== String(CFG.localPin || '1234')) { var e = new Error('pin'); e.code = 'pin/wrong'; throw e; }
+          sset('session', PIN_KEY, '1'); authE.emit({ signedIn: true, label: '' });
+        },
+        logout: async function () { sdel('session', PIN_KEY); authE.emit({ signedIn: false, label: '' }); },
+        onChange: function (cb) { var off = authE.on(cb); cb({ signedIn: authed(), label: '' }); return off; }
+      }
+    };
+  }
+
+  /* ---------------- FIREBASE (tempo real) ---------------- */
+  async function createFirebaseStore(opts) {
+    var base = 'https://www.gstatic.com/firebasejs/10.12.2/';
+    var mods = await Promise.all([
+      import(base + 'firebase-app.js'),
+      import(base + 'firebase-database.js'),
+      import(base + 'firebase-auth.js')
+    ]);
+    var appM = mods[0], dbM = mods[1], authM = mods[2];
+    var app = appM.initializeApp(fb);
+    var db = dbM.getDatabase(app);
+    var auth = authM.getAuth(app);
+    var ref = dbM.ref, onValue = dbM.onValue, update = dbM.update, push = dbM.push,
+        set = dbM.set, remove = dbM.remove, increment = dbM.increment,
+        query = dbM.query, limitToLast = dbM.limitToLast;
+
+    var data = emitter(), status = emitter();
+    var state = { players: {}, log: {}, forceRefresh: 0 };
+    var loaded = { players: false, log: !(opts && opts.needLog), meta: false };
+
+    function view() {
+      return {
+        ready: loaded.players && loaded.log && loaded.meta,
+        forceRefresh: state.forceRefresh,
+        players: Object.keys(state.players).map(function (id) { return Object.assign({ id: id }, state.players[id]); }),
+        log: Object.keys(state.log).map(function (id) { return Object.assign({ id: id }, state.log[id]); })
+          .sort(function (a, b) { return b.ts - a.ts; })
+      };
+    }
+    var notify = function () { data.emit(view()); };
+    var lastStatus = null;
+    var setSt = function (s) { lastStatus = s; status.emit(s); };
+    var fail = function () { setSt('error'); };
+
+    onValue(ref(db, 'players'), function (s) { state.players = s.val() || {}; loaded.players = true; notify(); }, fail);
+    onValue(ref(db, 'meta/forceRefresh'), function (s) { state.forceRefresh = s.val() || 0; loaded.meta = true; notify(); }, fail);
+    if (opts && opts.needLog) {
+      onValue(query(ref(db, 'log'), limitToLast(200)), function (s) { state.log = s.val() || {}; loaded.log = true; notify(); }, fail);
+    }
+    onValue(ref(db, '.info/connected'), function (s) { setSt(s.val() ? 'online' : 'offline'); });
+
+    return {
+      mode: 'firebase',
+      subscribe: function (cb) { var off = data.on(cb); cb(view()); return off; },
+      onStatus: function (cb) { var off = status.on(cb); if (lastStatus) cb(lastStatus); return off; },
+      addPlayer: async function (name) {
+        name = checkName(name, view().players);
+        var r = push(ref(db, 'players'));
+        await set(r, { name: name, points: 0, emoji: randEmoji() });
+        return r.key;
+      },
+      removePlayer: async function (id) { await remove(ref(db, 'players/' + id)); },
+      launch: async function (id, delta, note) {
+        checkDelta(delta);
+        var p = state.players[id];
+        if (!p) throw new Error('Jogador não encontrado.');
+        var key = push(ref(db, 'log')).key;
+        var up = {};
+        up['players/' + id + '/points'] = increment(delta);
+        up['log/' + key] = { playerId: id, name: p.name, delta: delta, note: note || '', ts: Date.now() };
+        await update(ref(db), up);
+      },
+      undo: async function (logId) {
+        var l = state.log[logId]; if (!l) return;
+        var up = {};
+        if (state.players[l.playerId]) up['players/' + l.playerId + '/points'] = increment(-l.delta);
+        up['log/' + logId] = null;
+        await update(ref(db), up);
+      },
+      forceRefresh: async function () { await set(ref(db, 'meta/forceRefresh'), Date.now()); },
+      resetPoints: async function () {
+        var up = { log: null };
+        Object.keys(state.players).forEach(function (id) { up['players/' + id + '/points'] = 0; });
+        await update(ref(db), up);
+      },
+      auth: {
+        /* Com crupierEmail no config, o crupier entra só com o PIN. O PIN vira a senha
+           da conta no Firebase com o prefixo "cassino-" (o Firebase exige 6+ caracteres). */
+        kind: CFG.crupierEmail ? 'pin' : 'email',
+        login: function (a, b) {
+          if (CFG.crupierEmail) return authM.signInWithEmailAndPassword(auth, CFG.crupierEmail, 'cassino-' + String(a).trim());
+          return authM.signInWithEmailAndPassword(auth, a, b);
+        },
+        logout: function () { return authM.signOut(auth); },
+        onChange: function (cb) {
+          return authM.onAuthStateChanged(auth, function (u) { cb({ signedIn: !!u, label: u ? u.email : '' }); });
+        }
+      }
+    };
+  }
+
+  window.CassinoStore = {
+    hasFirebase: hasFirebase,
+    create: function (opts) { return hasFirebase ? createFirebaseStore(opts || {}) : Promise.resolve(createLocalStore()); }
+  };
+})();
+
+</script>
+<script>
+(async function () {
+  'use strict';
+  var CFG = window.CASSINO_CONFIG;
+  var INTERVAL = Math.max(1, Number(CFG.refreshMinutes) || 3) * 60000;
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (n) { return Number(n).toLocaleString('pt-BR'); };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
+
+  $('title').textContent = 'Mesa do crupier';
+  $('sub').textContent = CFG.eventName || '';
+  document.title = 'Crupier – ' + (CFG.eventName || 'Cassino');
+
+  var MAX = Number(CFG.maxLaunch) || 100000;
+  var store, view = { players: [], log: [] }, selected = null, toastTimer, busy = false, wasIn = false;
+
+  function toast(msg, err) {
+    var t = $('toast'); t.textContent = msg; t.className = 'show' + (err ? ' err' : '');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.className = ''; }, 2600);
+  }
+  function writeError(e) {
+    var m = String((e && (e.code || e.message)) || '');
+    if (/permission|PERMISSION/i.test(m)) toast('Sem permissão para gravar. Entre de novo ou revise as regras do Firebase.', true);
+    else toast((e && e.message) || 'Não foi possível salvar.', true);
+  }
+  async function run(fn) { try { await fn(); return true; } catch (e) { console.error(e); writeError(e); return false; } }
+  /* Evita clique duplo gravar duas vezes (o Firebase soma cada gravação). */
+  async function guarded(fn) {
+    if (busy) return false;
+    busy = true; validate();
+    try { return await run(fn); } finally { busy = false; validate(); }
+  }
+
+  try { store = await CassinoStore.create({ needLog: true }); }
+  catch (e) { console.error(e); $('login').innerHTML = '<h2>Sem conexão</h2><p>Não foi possível conectar ao Firebase. Confira o config.js e a internet.</p>'; return; }
+
+  /* ---------- Login ---------- */
+  var isPin = store.auth.kind === 'pin';
+  $('emailWrap').hidden = isPin;
+  $('modeNote').hidden = store.mode !== 'local';
+  $('passLabel').textContent = isPin ? 'PIN do crupier' : 'Senha';
+  $('pass').setAttribute('inputmode', isPin ? 'numeric' : 'text');
+
+  var LOGIN_ERR = {
+    'pin/wrong': 'PIN incorreto.',
+    'auth/invalid-credential': 'E-mail ou senha incorretos.', 'auth/wrong-password': 'E-mail ou senha incorretos.',
+    'auth/user-not-found': 'E-mail ou senha incorretos.', 'auth/invalid-email': 'E-mail inválido.',
+    'auth/too-many-requests': 'Muitas tentativas. Aguarde um pouco e tente de novo.',
+    'auth/network-request-failed': 'Sem internet. Tente de novo.'
+  };
+  if (isPin) ['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'].forEach(function (k) { LOGIN_ERR[k] = 'PIN incorreto.'; });
+  $('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault(); $('loginMsg').textContent = '';
+    try { await (isPin ? store.auth.login($('pass').value) : store.auth.login($('email').value.trim(), $('pass').value)); $('pass').value = ''; }
+    catch (err) { $('loginMsg').textContent = LOGIN_ERR[err.code] || 'Não foi possível entrar.'; }
+  });
+  $('logoutBtn').addEventListener('click', function () { store.auth.logout(); });
+
+  store.auth.onChange(function (a) {
+    $('login').hidden = a.signedIn; $('app').hidden = !a.signedIn; $('topActions').hidden = !a.signedIn;
+    if (a.signedIn) { renderAll(); if (!wasIn) $('newName').focus(); }
+    else { selected = null; (isPin ? $('pass') : $('email')).focus(); }
+    wasIn = a.signedIn;
+  });
+  store.onStatus(function (st) {
+    var map = { online: 'Ao vivo', local: 'Modo teste (não chega à TV)', offline: 'Sem conexão', error: 'Erro de leitura' };
+    $('dot').className = 'dot ' + st; $('status').textContent = map[st] || st;
+  });
+  store.subscribe(function (v) { view = v; if (!$('app').hidden) renderAll(); });
+
+  /* ---------- Render ---------- */
+  var QUICK = [10, 50, 100, 500, -10, -50, -100, -500];
+  $('quick').innerHTML = QUICK.map(function (q) {
+    return '<button type="button" class="' + (q < 0 ? 'neg' : '') + '" data-q="' + q + '" aria-label="' + (q > 0 ? 'Ganhar ' : 'Descontar ') + Math.abs(q) + ' pontos">' + (q > 0 ? '+' : '−') + Math.abs(q) + '</button>';
+  }).join('');
+
+  /* Mantém o foco do teclado quando a lista é redesenhada por uma atualização ao vivo. */
+  function keepFocus(container, attr, render) {
+    var ae = document.activeElement;
+    var key = ae && container.contains(ae) ? ae.getAttribute(attr) : null;
+    render();
+    if (key) {
+      var els = container.querySelectorAll('[' + attr + ']');
+      for (var i = 0; i < els.length; i++) if (els[i].getAttribute(attr) === key) { els[i].focus(); break; }
+    }
+  }
+
+  function renderPlayers() {
+    var term = $('search').value.trim().toLowerCase();
+    var list = view.players.slice().sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); })
+      .filter(function (p) { return !term || String(p.name).toLowerCase().indexOf(term) !== -1; });
+    keepFocus($('plist'), 'data-id', function () {
+      $('plist').innerHTML = list.length ? list.map(function (p) {
+        return '<button type="button" class="pl ' + (p.id === selected ? 'sel' : '') + '" data-id="' + esc(p.id) + '" aria-pressed="' + (p.id === selected) + '">' +
+          '<span class="e" aria-hidden="true"><span>' + esc(p.emoji || '🎲') + '</span></span><span class="n">' + esc(p.name) + '</span><b>' + fmt(Number(p.points) || 0) + ' pts</b></button>';
+      }).join('') : '<div class="none">' + (view.players.length ? 'Nenhum jogador com esse nome.' : 'Nenhum jogador ainda. Adicione o primeiro acima.') + '</div>';
+    });
+  }
+  function renderWho() {
+    var p = view.players.filter(function (x) { return x.id === selected; })[0];
+    if (!p) { selected = null; $('who').innerHTML = '<span class="none">Escolha um jogador na lista para lançar pontos.</span>'; }
+    else $('who').innerHTML = '<span class="e" aria-hidden="true"><span>' + esc(p.emoji || '🎲') + '</span></span><div><strong>' + esc(p.name) + '</strong><span>' + fmt(Number(p.points) || 0) + ' pts agora</span></div>' +
+      '<button type="button" class="btn danger small" id="rmBtn" aria-label="Remover ' + esc(p.name) + ' da mesa" style="margin-left:auto">Remover</button>';
+    validate();
+  }
+  function renderLog() {
+    var items = (view.log || []).slice(0, 30);
+    keepFocus($('log'), 'data-undo', function () {
+      $('log').innerHTML = items.length ? items.map(function (l) {
+        var t = new Date(l.ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        var v = (l.delta > 0 ? '+' : '') + fmt(l.delta);
+        return '<div class="row"><time>' + t + '</time><div class="who2">' + esc(l.name) + (l.note ? '<small>' + esc(l.note) + '</small>' : '') + '</div>' +
+          '<span class="' + (l.delta >= 0 ? 'pos' : 'neg') + '">' + v + '</span>' +
+          '<button type="button" class="btn ghost small" data-undo="' + esc(l.id) + '" aria-label="Desfazer ' + v + ' pontos de ' + esc(l.name) + '">Desfazer</button></div>';
+      }).join('') : '<div class="none">Nenhum lançamento ainda.</div>';
+    });
+  }
+  function renderAll() { renderPlayers(); renderWho(); renderLog(); }
+
+  function amountState() {
+    var raw = $('amount').value.trim();
+    if (raw === '') return { v: 0, err: '' };
+    var n = Number(raw);
+    if (!isFinite(n) || !Number.isInteger(n)) return { v: 0, err: 'Use números inteiros, sem vírgula.' };
+    if (n === 0) return { v: 0, err: '' };
+    if (Math.abs(n) > MAX) return { v: 0, err: 'Máximo de ' + fmt(MAX) + ' pontos por lançamento.' };
+    return { v: n, err: '' };
+  }
+  function amountValue() { return amountState().v; }
+  function validate() {
+    var s = amountState();
+    $('amountHint').textContent = s.err;
+    $('launchBtn').disabled = busy || !(selected && s.v);
+  }
+
+  function tickNext() {
+    var at = Math.floor(Date.now() / INTERVAL) * INTERVAL + INTERVAL;
+    var s = Math.ceil((at - Date.now()) / 1000);
+    $('next').innerHTML = 'O dashboard mostra este lançamento às <b>' + new Date(at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) +
+      '</b> (em ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + ').';
+  }
+  setInterval(tickNext, 1000); tickNext();
+
+  /* ---------- Eventos ---------- */
+  $('plist').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-id]'); if (!b) return;
+    selected = b.dataset.id; renderPlayers(); renderWho(); $('amount').focus();
+  });
+  $('search').addEventListener('input', renderPlayers);
+  $('quick').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-q]'); if (!b) return;
+    $('amount').value = b.dataset.q; validate(); $('amount').focus();
+  });
+  $('amount').addEventListener('input', validate);
+  $('signBtn').addEventListener('click', function () {
+    var n = Number($('amount').value);
+    if (!n) { $('amountHint').textContent = 'Digite um valor ou toque num atalho antes de trocar o sinal.'; $('amount').focus(); return; }
+    $('amount').value = String(-n); validate(); $('amount').focus();
+  });
+  $('who').addEventListener('click', async function (e) {
+    if (e.target.id !== 'rmBtn') return;
+    var p = view.players.filter(function (x) { return x.id === selected; })[0]; if (!p) return;
+    if (!confirm('Remover ' + p.name + ' da mesa? Os pontos dele(a) saem do ranking.')) return;
+    if (await guarded(function () { return store.removePlayer(p.id); })) { selected = null; toast(p.name + ' removido(a).'); }
+  });
+  $('addForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var name = $('newName').value;
+    var id; var ok = await guarded(async function () { id = await store.addPlayer(name); });
+    if (ok) { $('newName').value = ''; selected = id; toast('Jogador adicionado.'); $('amount').focus(); }
+  });
+  $('launchForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var v = amountValue(); if (!selected || !v) return;
+    var p = view.players.filter(function (x) { return x.id === selected; })[0];
+    var ok = await guarded(function () { return store.launch(selected, v, $('note').value.trim()); });
+    if (ok) {
+      toast((v > 0 ? '+' : '') + fmt(v) + ' pts para ' + (p ? p.name : 'jogador'));
+      $('amount').value = ''; $('note').value = ''; selected = null; renderAll(); $('search').value = ''; renderPlayers(); $('search').focus();
+    }
+  });
+  $('log').addEventListener('click', async function (e) {
+    var b = e.target.closest('[data-undo]'); if (!b) return;
+    if (await guarded(function () { return store.undo(b.dataset.undo); })) toast('Lançamento desfeito.');
+  });
+  $('forceBtn').addEventListener('click', async function () {
+    if (await guarded(function () { return store.forceRefresh(); })) toast('Tierlist atualizado no dashboard.');
+  });
+  $('resetBtn').addEventListener('click', async function () {
+    if (!confirm('Zerar os pontos de TODOS os jogadores e apagar o histórico? Isso não pode ser desfeito.')) return;
+    if (await guarded(function () { return store.resetPoints(); })) toast('Pontos zerados.');
+  });
+  $('csvBtn').addEventListener('click', function () {
+    var q = function (s) { return '"' + String(s).replace(/"/g, '""') + '"'; };
+    var rows = view.players.slice().sort(function (a, b) { return (Number(b.points) || 0) - (Number(a.points) || 0); })
+      .map(function (p, i) { return [i + 1, q(p.name), Number(p.points) || 0].join(';'); });
+    var blob = new Blob(['\ufeffposicao;jogador;pontos\n' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'ranking-' + new Date().toISOString().slice(0, 10) + '.csv'; a.click(); URL.revokeObjectURL(a.href);
+  });
+})();
+</script>
+</body>
+</html>
