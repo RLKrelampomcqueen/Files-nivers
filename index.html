@@ -134,7 +134,7 @@ input::placeholder{color:rgba(43,21,18,.62)}
   @keyframes deal-front{from{transform:translate(-62%,-8%) rotate(-13deg);opacity:0}to{transform:rotate(6deg);opacity:1}}
   @keyframes shuffle-back{from{transform:translateX(7%) rotate(-5deg)}to{transform:rotate(-13deg)}}
 
-  /* Ranking: faixas por tier */
+  /* Ranking: uma faixa só, do 1º ao último */
   main{padding:clamp(8px,2vh,20px) clamp(16px,3vw,48px) 20px;display:flex;flex-direction:column;flex:1}
   .lane{display:grid;grid-template-columns:clamp(150px,21vw,360px) 1fr;border-top:1.5px solid rgba(185,170,164,.3)}
   .lane:last-child{border-bottom:1.5px solid rgba(185,170,164,.3)}
@@ -261,7 +261,7 @@ input::placeholder{color:rgba(43,21,18,.62)}
     </div>
   </section>
 
-  <main id="board" class="board" aria-label="Ranking por tier"><div class="state"><b>Preparando a mesa…</b>Carregando o ranking.</div></main>
+  <main id="board" class="board" aria-label="Ranking"><div class="state"><b>Preparando a mesa…</b>Carregando o ranking.</div></main>
 
   <footer>
     <div class="grp">
@@ -285,7 +285,7 @@ window.CASSINO_CONFIG = {
   eventDate: "Sábado, 14 de novembro, 20h",
   dressCode: "Jogo do Bicho",
 
-  // De quantos em quantos minutos o tierlist do dashboard é atualizado.
+  // De quantos em quantos minutos o ranking do placar é atualizado.
   // As atualizações seguem o relógio (:00, :03, :06...), então várias telas ficam sincronizadas.
   refreshMinutes: 3,
 
@@ -296,12 +296,6 @@ window.CASSINO_CONFIG = {
   // Com Firebase configurado, o crupier entra com e-mail e senha.
   localPin: "0000",
 
-  // Tiers: do maior para o menor. "min" é a pontuação mínima para entrar no tier.
-  tiers: [
-    { name: "Ouro",     suit: "♥", red: true,  min: 500,  metal: ["#ffe39a", "#ffb86b"] },
-    { name: "Prata",    suit: "♠", red: false, min: 250,  metal: ["#f4f1ea", "#cfc9bd"] },
-    { name: "Bronze",   suit: "♣", red: false, min: 0,    metal: ["#ffcf9f", "#e9965a"] }
-  ],
 
   // Cole aqui a configuração do Firebase (veja o LEIAME.md, passo 1).
   // Enquanto estiver null, o sistema roda em modo teste: dados só no mesmo navegador.
@@ -543,7 +537,6 @@ window.CASSINO_CONFIG = {
   'use strict';
   var CFG = window.CASSINO_CONFIG;
   var INTERVAL = Math.max(1, Number(CFG.refreshMinutes) || 3) * 60000;
-  var TIERS = CFG.tiers.slice().sort(function (a, b) { return b.min - a.min; });
   var C = 2 * Math.PI * 44;
   var $ = function (id) { return document.getElementById(id); };
   var fmt = function (n) { return Number(n).toLocaleString('pt-BR'); };
@@ -577,10 +570,6 @@ window.CASSINO_CONFIG = {
     return { ready: true, forceRefresh: 0, log: [], players: n.map(function (name, i) { return { id: 'demo' + i, name: name, points: p[i], emoji: e[i] }; }) };
   }
 
-  function tierFor(points) {
-    for (var i = 0; i < TIERS.length; i++) if (points >= TIERS[i].min) return TIERS[i];
-    return TIERS[TIERS.length - 1];
-  }
   function nextBoundary() { return Math.floor(Date.now() / INTERVAL) * INTERVAL + INTERVAL; }
   /* As setas comparam com o ciclo anterior. Recarregar a página ou forçar atualização
      dentro do mesmo ciclo mantém a mesma base de comparação. */
@@ -624,25 +613,21 @@ window.CASSINO_CONFIG = {
       var maxDigits = players.reduce(function (m, p) { return Math.max(m, String(Math.abs(p.points)).length); }, 1);
       var cls = 'board' + (players.length > 40 ? ' denser' : players.length > 18 ? ' dense' : '') + (maxDigits >= 5 ? ' bignum' : '');
       var idx = 0;
-      var html = TIERS.map(function (t, ti) {
-        var list = players.filter(function (p) { return tierFor(p.points) === t; });
-        var cards = list.map(function (p) {
-          var pv = pmap && pmap[p.id];
-          var mvHtml = pv ? mv(pv.rank - p.rank, p.points - pv.points) : '';
-          return '<article class="card ' + (t.red ? 'red' : '') + '" style="--i:' + Math.min(idx++, 30) + '">' +
-            '<div class="corner"><b>' + p.rank + 'º</b><i aria-hidden="true">' + esc(t.suit) + '</i></div>' +
-            '<div class="face"><span class="emoji" aria-hidden="true"><span>' + esc(p.emoji) + '</span></span><h3>' + esc(p.name) + '</h3></div>' +
-            '<div class="foot"><div class="pts">' + fmt(p.points) + '<small>pts</small></div><div class="mv">' + mvHtml + '</div></div>' +
-            '</article>';
-        }).join('');
-        var last = ti === TIERS.length - 1 && ti > 0;
-        var range = last ? 'até ' + fmt(TIERS[ti - 1].min - 1) + ' pts' : fmt(t.min) + '+ pts';
-        return '<section class="lane" aria-labelledby="tier-' + ti + '">' +
-          '<div class="lane-label ' + (t.red ? 'red' : '') + '" style="--m1:' + t.metal[0] + ';--m2:' + t.metal[1] + '">' +
-          '<div class="suit" aria-hidden="true">' + esc(t.suit) + '</div><h2 id="tier-' + ti + '">' + esc(t.name) + '</h2>' +
-          '<p>' + range + '<br>' + list.length + (list.length === 1 ? ' jogador' : ' jogadores') + '</p></div>' +
-          '<div class="lane-body">' + (cards || '<div class="empty">Nenhum jogador neste tier ainda.</div>') + '</div></section>';
+      /* Um ranking só, do 1º ao último, por quem tem mais pontos (empates dividem a posição). */
+      var SUITS = ['♥', '♠', '♦', '♣'];
+      var cards = players.map(function (p) {
+        var pv = pmap && pmap[p.id];
+        var mvHtml = pv ? mv(pv.rank - p.rank, p.points - pv.points) : '';
+        return '<article class="card" style="--i:' + Math.min(idx++, 30) + '">' +
+          '<div class="corner"><b>' + p.rank + 'º</b><i aria-hidden="true">' + SUITS[(p.rank - 1) % 4] + '</i></div>' +
+          '<div class="face"><span class="emoji" aria-hidden="true"><span>' + esc(p.emoji) + '</span></span><h3>' + esc(p.name) + '</h3></div>' +
+          '<div class="foot"><div class="pts">' + fmt(p.points) + '<small>pts</small></div><div class="mv">' + mvHtml + '</div></div>' +
+          '</article>';
       }).join('');
+      var html = '<section class="lane" aria-labelledby="rank-title">' +
+        '<div class="lane-label"><div class="suit" aria-hidden="true">♥</div><h2 id="rank-title">Ranking</h2>' +
+        '<p>' + players.length + (players.length === 1 ? ' jogador' : ' jogadores') + '<br>do 1º ao último</p></div>' +
+        '<div class="lane-body">' + cards + '</div></section>';
       board.className = cls; void board.offsetWidth;
       board.innerHTML = html;
       board.classList.add('deal');
