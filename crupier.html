@@ -175,7 +175,7 @@ input::placeholder{color:rgba(43,21,18,.62)}
   <div class="actions" id="topActions" hidden>
     <span class="chip"><span class="dot" id="dot"></span><span id="status">Conectando…</span></span>
     <a class="btn ghost small" href="index.html" target="_blank" rel="noopener">Abrir dashboard</a>
-    <button class="btn small" id="forceBtn" type="button">Atualizar tierlist agora</button>
+    <button class="btn small" id="forceBtn" type="button">Atualizar ranking agora</button>
     <button class="btn ghost small" id="csvBtn" type="button">Exportar CSV</button>
     <button class="btn ghost small" id="resetBtn" type="button">Zerar pontos</button>
     <button class="btn ghost small" id="logoutBtn" type="button">Sair</button>
@@ -249,7 +249,7 @@ window.CASSINO_CONFIG = {
   eventDate: "Sábado, 14 de novembro, 20h",
   dressCode: "Jogo do Bicho",
 
-  // De quantos em quantos minutos o tierlist do dashboard é atualizado.
+  // De quantos em quantos minutos o ranking do placar é atualizado.
   // As atualizações seguem o relógio (:00, :03, :06...), então várias telas ficam sincronizadas.
   refreshMinutes: 3,
 
@@ -260,12 +260,6 @@ window.CASSINO_CONFIG = {
   // Com Firebase configurado, o crupier entra com e-mail e senha.
   localPin: "0000",
 
-  // Tiers: do maior para o menor. "min" é a pontuação mínima para entrar no tier.
-  tiers: [
-    { name: "Ouro",     suit: "♥", red: true,  min: 500,  metal: ["#ffe39a", "#ffb86b"] },
-    { name: "Prata",    suit: "♠", red: false, min: 250,  metal: ["#f4f1ea", "#cfc9bd"] },
-    { name: "Bronze",   suit: "♣", red: false, min: 0,    metal: ["#ffcf9f", "#e9965a"] }
-  ],
 
   // Cole aqui a configuração do Firebase (veja o LEIAME.md, passo 1).
   // Enquanto estiver null, o sistema roda em modo teste: dados só no mesmo navegador.
